@@ -343,7 +343,7 @@ class ChatGPTTelegramBot:
             return
 
         chat_id = update.effective_chat.id
-        filename = update.message.effective_attachment.file_unique_id
+        filename = update.message.effective_attachment.file_unique_id + ".ogg"
 
         async def _execute():
             filename_mp3 = f'{filename}.mp3'
@@ -366,7 +366,6 @@ class ChatGPTTelegramBot:
 
             try:
                 audio_track = AudioSegment.from_file(filename)
-                audio_track.export(filename_mp3, format="mp3")
                 logging.info(f'New transcribe request received from user {update.message.from_user.name} '
                              f'(id: {update.message.from_user.id})')
 
@@ -386,7 +385,7 @@ class ChatGPTTelegramBot:
                 self.usage[user_id] = UsageTracker(user_id, update.message.from_user.name)
 
             try:
-                transcript = await self.openai.transcribe(filename_mp3)
+                transcript = await self.openai.transcribe(filename)
 
                 transcription_price = self.config['transcription_price']
                 self.usage[user_id].add_transcription_seconds(audio_track.duration_seconds, transcription_price)
